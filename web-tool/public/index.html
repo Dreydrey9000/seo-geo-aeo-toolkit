@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SEO + GEO + AEO Generator</title>
+<meta name="description" content="Paste a video transcript, a topic, or a tweet and get it optimized for SEO, GEO, and AEO: keywords, the lines AI will quote you on, buyer questions, hooks, a crawlable long-form version, and ready-to-post copy." />
+<meta name="robots" content="index,follow" />
+<style>
+  :root{--cream:#F4F1EC;--ink:#1A1A1A;--orange:#F97316;--line:#E3DDD2;--muted:#6B6359;--card:#FFFFFF;--good:#1F7A4D}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Helvetica,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:880px;margin:0 auto;padding:32px 20px 90px}
+  header{border-bottom:3px solid var(--ink);padding-bottom:18px}
+  .kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);font-weight:700}
+  h1{font-size:34px;line-height:1.1;margin:6px 0 6px}
+  .sub{color:var(--muted);font-size:16px;max-width:62ch}
+  .defs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0 4px}
+  .def{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 14px}
+  .def b{display:block;font-size:15px}.def span{font-size:13px;color:var(--muted)}
+  h2{font-size:14px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:28px 0 10px}
+  label{display:block;font-weight:600;font-size:14px;margin:13px 0 5px}
+  .hint{font-weight:400;color:var(--muted);font-size:13px}
+  input[type=text],textarea,select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:var(--card);color:var(--ink)}
+  textarea{resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .platforms{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:14px;cursor:pointer;user-select:none}
+  .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn{background:var(--orange);color:#fff;border:none;border-radius:10px;padding:14px 24px;font-size:16px;font-weight:700;cursor:pointer;margin-top:20px}
+  .btn:disabled{opacity:.5;cursor:default}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);font-size:13px;padding:8px 14px;margin-top:0}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .clientbar{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0 4px}
+  .clientrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .clientrow select{flex:1;min-width:160px}
+  @media(max-width:620px){.clientrow{flex-direction:column;align-items:stretch}.clientrow .btn.ghost{width:100%}}
+  .out{margin-top:24px;display:none}.out.show{display:block}
+  .result{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 26px 26px}
+  .result h2{font-size:13px;color:var(--orange);border-top:1px solid var(--line);padding-top:18px;margin-top:24px}
+  .result h2:first-of-type{border-top:none;margin-top:14px}
+  .result h3{font-size:16px;color:var(--ink);text-transform:none;letter-spacing:0;margin:18px 0 6px}
+  .result pre{white-space:pre-wrap;background:#1A1A1A;color:#F4F1EC;border-radius:10px;padding:14px;font-size:12.5px;overflow:auto}
+  .result code{background:#efeae0;padding:1px 5px;border-radius:5px;font-size:90%}
+  .result pre code{background:none;padding:0}
+  .result ul,.result ol{padding-left:22px}.result li{margin-bottom:5px}
+  .loading{display:none;margin-top:24px;color:var(--muted)}.loading.show{display:block}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--orange);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px;margin-right:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .err{display:none;margin-top:20px;background:#FEF2F2;border:1px solid #FECACA;color:#991B1B;border-radius:10px;padding:13px 16px;font-size:14px}.err.show{display:block}
+  .note{background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:14px 16px;font-size:14px;margin-top:26px}.note b{color:#9A3412}
+  footer{margin-top:40px;border-top:1px solid var(--line);padding-top:16px;color:var(--muted);font-size:13px}
+  .ok{color:var(--good);font-weight:700;font-size:13px}
+  @media(max-width:620px){.defs{grid-template-columns:1fr}.row{grid-template-columns:1fr}h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Search + AI Answer Optimizer</div>
+    <h1>SEO + GEO + AEO Generator</h1>
+    <p class="sub">Paste a video transcript, a topic, or a tweet. This runs it through all three lenses and hands you back the full package: keywords, the exact lines AI will quote you on, the buyer questions to win, hooks, a crawlable long-form version, and ready-to-post copy.</p>
+  </header>
+
+  <div class="defs">
+    <div class="def"><b>SEO</b><span>Get FOUND when people search.</span></div>
+    <div class="def"><b>GEO</b><span>Get CITED inside the AI's answer.</span></div>
+    <div class="def"><b>AEO</b><span>Win the exact buying questions.</span></div>
+  </div>
+
+  <h2>1. About you <span class="hint">(saved in your browser)</span></h2>
+  <div class="clientbar" id="clientbar">
+    <label for="profileSelect" style="margin:0 0 6px">Client profile <span class="hint">(keep one per client, switch any time)</span></label>
+    <div class="clientrow">
+      <select id="profileSelect" aria-label="Client profile"></select>
+      <button class="btn ghost" id="newClient" type="button">+ New client</button>
+      <button class="btn ghost" id="delClient" type="button">Delete client</button>
+    </div>
+  </div>
+  <div class="row">
+    <div><label>Brand or name<input id="brand" type="text" /></label></div>
+    <div><label>What you sell <span class="hint">(one line)</span><input id="offer" type="text" /></label></div>
+  </div>
+  <label>Who it's for <span class="hint">(role + the pain)</span><input id="icp" type="text" /></label>
+  <div class="row">
+    <div><label>Search you most want to own<input id="kw" type="text" /></label></div>
+    <div><label>Competitors / alternatives <span class="hint">(optional)</span><input id="comp" type="text" /></label></div>
+  </div>
+  <label>Voice rules <span class="hint">(optional)</span><input id="voice" type="text" /></label>
+  <label>Platforms</label>
+  <div class="platforms" id="platforms">
+    <span class="chip" data-p="Instagram">Instagram</span>
+    <span class="chip" data-p="TikTok">TikTok</span>
+    <span class="chip" data-p="LinkedIn">LinkedIn</span>
+    <span class="chip" data-p="X / Twitter">X / Twitter</span>
+    <span class="chip" data-p="YouTube">YouTube</span>
+  </div>
+  <div class="toolbar"><span></span><button class="btn ghost" id="reset" type="button">Clear fields</button></div>
+
+  <h2>2. Your content</h2>
+  <label>What is it?
+    <select id="itype">
+      <option>a topic / idea</option>
+      <option>a video transcript</option>
+      <option>a tweet</option>
+      <option>an existing caption or post</option>
+      <option>raw notes</option>
+    </select>
+  </label>
+  <label>Paste it here
+    <textarea id="content" rows="7" placeholder="Paste your transcript, topic, tweet, or notes..."></textarea>
+  </label>
+
+  <button class="btn" id="go">Optimize it</button>
+
+  <div class="loading" id="loading"><span class="spinner"></span>Running SEO + GEO + AEO... this takes 15 to 40 seconds.</div>
+  <div class="err" id="err"></div>
+
+  <div class="out" id="out">
+    <h2>Your optimization package <span class="ok" id="copied"></span></h2>
+    <div class="toolbar"><span></span><button class="btn ghost" id="copy" type="button">Copy all</button></div>
+    <div class="result" id="result"></div>
+  </div>
+
+  <div class="note">
+    <b>The part most people skip:</b> AI engines cite TEXT on the open web, not social captions. The most valuable output below is the <b>Text-Home version</b>. Publish that on a webpage, a LinkedIn article, or a YouTube description, and that is what gets you quoted inside AI answers. <a href="/instead-of-hiring.html">See a live example.</a>
+  </div>
+
+  <footer><span id="credit"></span>Frameworks adapted from the open-source AiCMO Autonomous Marketing Engine (Apache-2.0). Your inputs are sent to the AI to generate your package and are not stored.</footer>
+</div>
+
+<script>
+(function(){
+  var PK="sgaeo_profiles";
+  var FIELDS=["brand","offer","icp","kw","comp","voice"];
+  var isDrey=/(^|\.)dreythomas\.com$/.test(location.hostname);
+  var DREY={brand:"Drey",offer:"AI systems for burnt-out entrepreneurs so they get their time back instead of hiring",icp:"busy, burnt-out solo entrepreneurs who already use AI and cannot justify a 50k hire",kw:"AI automation instead of hiring an employee",comp:"hiring a first employee, hiring a VA, an agency",voice:"plain 7th to 8th grade, no hashtags, no dashes, no emojis, promise work LESS not more, say instead of hiring never replace",platforms:["Instagram","TikTok","X / Twitter","LinkedIn","YouTube"]};
+  function blank(){return {brand:"",offer:"",icp:"",kw:"",comp:"",voice:"",platforms:["Instagram","LinkedIn","X / Twitter"]};}
+  function seed(){ return isDrey ? {profiles:{"Drey":DREY},active:"Drey"} : {profiles:{"Client 1":blank()},active:"Client 1"}; }
+
+  // credit line by host
+  document.getElementById("credit").textContent = isDrey ? "Built by Drey on dreythomas.com. " : "";
+
+  var store;
+  function persist(){ try{localStorage.setItem(PK,JSON.stringify(store));}catch(e){} }
+  function loadStore(){
+    var s; try{s=JSON.parse(localStorage.getItem(PK));}catch(e){}
+    if(!s||!s.profiles||!s.active||!s.profiles[s.active]) s=seed();
+    store=s; persist();
+  }
+  function setPlatforms(arr){arr=arr||[];document.querySelectorAll(".chip").forEach(function(c){c.classList.toggle("on",arr.indexOf(c.dataset.p)>=0);});}
+  function v(id){return (document.getElementById(id).value||"").trim();}
+  function plats(){return Array.prototype.slice.call(document.querySelectorAll(".chip.on")).map(function(c){return c.dataset.p;});}
+  function readFields(){var o={};FIELDS.forEach(function(k){o[k]=v(k);});o.platforms=plats();return o;}
+  function fillFields(p){p=p||blank();FIELDS.forEach(function(k){document.getElementById(k).value=p[k]||"";});setPlatforms(p.platforms);}
+  function saveCurrent(){ if(store&&store.active){ store.profiles[store.active]=readFields(); persist(); } }
+
+  var sel=document.getElementById("profileSelect");
+  function renderSelect(){
+    sel.innerHTML="";
+    Object.keys(store.profiles).forEach(function(name){
+      var o=document.createElement("option");o.value=name;o.textContent=name;
+      if(name===store.active)o.selected=true; sel.appendChild(o);
+    });
+  }
+  function switchTo(name){ if(!store.profiles[name])return; store.active=name; fillFields(store.profiles[name]); persist(); }
+
+  loadStore();
+  renderSelect();
+  fillFields(store.profiles[store.active]);
+
+  sel.addEventListener("change",function(){ saveCurrent(); switchTo(sel.value); });
+  document.getElementById("newClient").addEventListener("click",function(){
+    var name=(window.prompt("Name this client profile (e.g. their brand name):")||"").trim();
+    if(!name)return;
+    if(store.profiles[name]){ switchTo(name); renderSelect(); return; }
+    saveCurrent(); store.profiles[name]=blank(); store.active=name; persist(); renderSelect(); fillFields(store.profiles[name]);
+  });
+  document.getElementById("delClient").addEventListener("click",function(){
+    var names=Object.keys(store.profiles);
+    if(names.length<=1){ window.alert("Keep at least one profile. Use 'Clear fields' to empty this one instead."); return; }
+    if(!window.confirm("Delete the profile \""+store.active+"\"? This cannot be undone.")) return;
+    delete store.profiles[store.active]; store.active=Object.keys(store.profiles)[0]; persist(); renderSelect(); fillFields(store.profiles[store.active]);
+  });
+
+  // auto-save edits to the active profile
+  FIELDS.forEach(function(k){ document.getElementById(k).addEventListener("input",saveCurrent); });
+  document.getElementById("platforms").addEventListener("click",function(e){ if(e.target.classList.contains("chip")){ e.target.classList.toggle("on"); saveCurrent(); } });
+  document.getElementById("reset").addEventListener("click",function(){
+    FIELDS.forEach(function(k){document.getElementById(k).value="";}); setPlatforms([]); saveCurrent();
+  });
+
+  // minimal, safe markdown renderer (escapes HTML first)
+  function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function inlineMd(s){
+    return s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>").replace(/`([^`]+)`/g,"<code>$1</code>");
+  }
+  function renderMd(md){
+    md=esc(md);
+    var lines=md.split("\n"),html="",inCode=false,inList=false,listTag="";
+    function closeList(){if(inList){html+="</"+listTag+">";inList=false;}}
+    for(var i=0;i<lines.length;i++){
+      var ln=lines[i];
+      if(/^```/.test(ln)){ if(!inCode){closeList();html+="<pre><code>";inCode=true;} else {html+="</code></pre>";inCode=false;} continue; }
+      if(inCode){ html+=ln+"\n"; continue; }
+      if(/^###\s+/.test(ln)){closeList();html+="<h3>"+inlineMd(ln.replace(/^###\s+/,""))+"</h3>";continue;}
+      if(/^##\s+/.test(ln)){closeList();html+="<h2>"+inlineMd(ln.replace(/^##\s+/,""))+"</h2>";continue;}
+      if(/^#\s+/.test(ln)){closeList();html+="<h3>"+inlineMd(ln.replace(/^#\s+/,""))+"</h3>";continue;}
+      var om=ln.match(/^\s*\d+\.\s+(.*)/);
+      if(om){ if(!inList||listTag!=="ol"){closeList();html+="<ol>";inList=true;listTag="ol";} html+="<li>"+inlineMd(om[1])+"</li>"; continue; }
+      var um=ln.match(/^\s*[-*]\s+(.*)/);
+      if(um){ if(!inList||listTag!=="ul"){closeList();html+="<ul>";inList=true;listTag="ul";} html+="<li>"+inlineMd(um[1])+"</li>"; continue; }
+      if(/^\s*$/.test(ln)){closeList();continue;}
+      closeList(); html+="<p>"+inlineMd(ln)+"</p>";
+    }
+    closeList(); if(inCode) html+="</code></pre>";
+    return html;
+  }
+
+  var rawOut="";
+  function show(el){el.classList.add("show");} function hide(el){el.classList.remove("show");}
+  var go=document.getElementById("go");
+
+  go.addEventListener("click",function(){
+    var content=v("content");
+    if(content.length<8){ var e=document.getElementById("err"); e.textContent="Paste some content first."; show(e); return; }
+    var payload={brand:v("brand"),offer:v("offer"),icp:v("icp"),kw:v("kw"),comp:v("comp"),voice:v("voice"),itype:v("itype"),platforms:plats(),content:content};
+    saveCurrent();
+    hide(document.getElementById("err")); hide(document.getElementById("out"));
+    show(document.getElementById("loading")); go.disabled=true;
+    fetch("/api/generate",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        hide(document.getElementById("loading")); go.disabled=false;
+        if(!d.ok){ var e=document.getElementById("err"); e.textContent=d.error||"Something went wrong."; show(e); return; }
+        rawOut=d.output;
+        document.getElementById("result").innerHTML=renderMd(d.output);
+        show(document.getElementById("out"));
+        document.getElementById("out").scrollIntoView({behavior:"smooth"});
+      })
+      .catch(function(){ hide(document.getElementById("loading")); go.disabled=false; var e=document.getElementById("err"); e.textContent="Network error. Try again."; show(e); });
+  });
+
+  document.getElementById("copy").addEventListener("click",function(){
+    navigator.clipboard.writeText(rawOut).then(function(){
+      document.getElementById("copied").textContent="copied";
+      setTimeout(function(){document.getElementById("copied").textContent="";},2500);
+    });
+  });
+})();
+</script>
+</body>
+</html>
