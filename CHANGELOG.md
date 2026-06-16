@@ -1,5 +1,9 @@
 # Changelog — seo-geo-aeo-toolkit
 
+## [2026-06-16] (Master Prompts: fill-then-copy)
+### Changed
+- **Master Prompts tab is now fill-in-the-fields, not edit-the-brackets.** Each prompt lists the inputs it needs as labeled fields up top; you fill them and hit "Copy filled prompt" to get a ready-to-paste prompt with your values substituted in. Field values are shared across prompts (fill "What you sell" once, it carries everywhere) and saved in the browser. "Show prompt" reveals the assembled text. On seo.dreythomas.com the fields pre-fill with Drey's brand; everywhere else they start blank.
+
 ## [2026-06-16] (later same day)
 ### Added
 - **Master Prompts tab** in the web tool: a library of 5 copy-paste, plug-into-any-AI prompts (SEO + GEO + AEO, Ideal Client (ICP) Builder, Brand Voice & Positioning Builder, Viral Hook Generator, Content Repurposer). Brand-neutral, fill-the-brackets. Lives in public/prompts.js, rendered as a second tab next to the Generator. Linkable at /#prompts.

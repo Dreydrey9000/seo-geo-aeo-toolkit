@@ -59,8 +59,12 @@
   .pcard h3{margin:0 0 3px;font-size:18px}
   .pcard .pdesc{color:var(--muted);font-size:14px;margin:0 0 12px}
   .pcard .ptext{white-space:pre-wrap;background:#FBF9F5;border:1px solid var(--line);border-radius:10px;padding:14px;font-size:13px;max-height:230px;overflow:auto;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#2a2620}
-  .pcard .pbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+  .pcard .pbar{display:flex;align-items:center;gap:10px;margin-top:14px;flex-wrap:wrap}
   .pcard .pbar .ok{min-height:1em}
+  .mphdr{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 2px}
+  .mpfields{margin-bottom:2px}
+  .mplabel{display:block;font-weight:600;font-size:14px;margin:11px 0 0}
+  .mpf{margin-top:5px}
   @media(max-width:620px){.defs{grid-template-columns:1fr}.row{grid-template-columns:1fr}h1{font-size:27px}.tab{padding:10px 11px;font-size:14px}}
 </style>
 </head>
@@ -286,28 +290,58 @@
   tabs.addEventListener("click",function(e){ if(e.target.classList.contains("tab")) activate(e.target.dataset.tab); });
   if(location.hash==="#prompts") activate("prompts");
 
-  // ---- master prompts library ----
+  // ---- master prompts: fill the fields, copy the assembled prompt ----
   function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  function escAttr(s){return esc(s).replace(/"/g,"&quot;");}
   var list=document.getElementById("promptList");
   var prompts=window.MASTER_PROMPTS||[];
   if(!prompts.length){ list.innerHTML="<p class='pdesc'>Prompts did not load. Refresh the page.</p>"; return; }
+
+  // values are shared across prompts by token, saved in the browser
+  var MPK="sgaeo_mp", MPV={};
+  try{MPV=JSON.parse(localStorage.getItem(MPK))||{};}catch(e){}
+  if(/(^|\.)dreythomas\.com$/.test(location.hostname)){
+    var seed={"[BRAND OR NAME]":"Drey","[WHAT YOU SELL]":"AI systems for burnt-out entrepreneurs so they get their time back instead of hiring","[WHO IT IS FOR + THEIR PAIN]":"busy, burnt-out solo entrepreneurs who already use AI and cannot justify a 50k hire","[MONEY KEYWORD YOU WANT TO OWN]":"AI automation instead of hiring an employee","[COMPETITORS OR ALTERNATIVES]":"hiring a first employee, hiring a VA, an agency","[VOICE RULES]":"plain 7th to 8th grade, no hashtags, no dashes, no emojis, promise work LESS not more, say instead of hiring never replace","[PLATFORMS]":"Instagram, TikTok, X / Twitter, LinkedIn, YouTube"};
+    Object.keys(seed).forEach(function(k){ if(!MPV[k]) MPV[k]=seed[k]; });
+  }
+  function saveMPV(){ try{localStorage.setItem(MPK,JSON.stringify(MPV));}catch(e){} }
+  function assemble(p){ var out=p.prompt; (p.fields||[]).forEach(function(f){ var val=(MPV[f.token]||"").trim(); if(val) out=out.split(f.token).join(val); }); return out; }
+
   prompts.forEach(function(p,i){
+    var fieldsHtml=(p.fields||[]).map(function(f){
+      var val=MPV[f.token]||"";
+      var input=f.big
+        ? "<textarea class='mpf' rows='2' data-token=\""+escAttr(f.token)+"\" placeholder=\""+escAttr(f.hint||"")+"\">"+esc(val)+"</textarea>"
+        : "<input class='mpf' type='text' data-token=\""+escAttr(f.token)+"\" placeholder=\""+escAttr(f.hint||"")+"\" value=\""+escAttr(val)+"\" />";
+      return "<label class='mplabel'>"+esc(f.label)+input+"</label>";
+    }).join("");
     var card=document.createElement("div"); card.className="pcard";
     card.innerHTML=
       "<h3>"+esc(p.title)+"</h3>"+
       "<p class='pdesc'>"+esc(p.desc)+"</p>"+
-      "<div class='ptext'>"+esc(p.prompt)+"</div>"+
-      "<div class='pbar'><span class='ok' id='pok"+i+"'></span>"+
-      "<button class='btn ghost' type='button' data-i='"+i+"'>Copy prompt</button></div>";
+      "<div class='mphdr'>What you need (fill these in, they carry across prompts):</div>"+
+      "<div class='mpfields'>"+fieldsHtml+"</div>"+
+      "<div class='pbar'>"+
+        "<button class='btn' type='button' data-copy='"+i+"'>Copy filled prompt</button>"+
+        "<button class='btn ghost' type='button' data-toggle='"+i+"'>Show prompt</button>"+
+        "<span class='ok' id='pok"+i+"'></span>"+
+      "</div>"+
+      "<div class='ptext' id='pt"+i+"' style='display:none'></div>";
     list.appendChild(card);
   });
+
+  list.addEventListener("input",function(e){
+    if(!e.target.classList.contains("mpf")) return;
+    var token=e.target.dataset.token, val=e.target.value;
+    MPV[token]=val; saveMPV();
+    document.querySelectorAll(".mpf").forEach(function(el){ if(el.dataset.token===token && el!==e.target && el.value!==val) el.value=val; });
+    prompts.forEach(function(p,i){ var pv=document.getElementById("pt"+i); if(pv&&pv.style.display!=="none") pv.textContent=assemble(p); });
+  });
   list.addEventListener("click",function(e){
-    var b=e.target.closest("button[data-i]"); if(!b) return;
-    var i=b.getAttribute("data-i");
-    navigator.clipboard.writeText(prompts[i].prompt).then(function(){
-      var ok=document.getElementById("pok"+i); ok.textContent="copied to clipboard";
-      setTimeout(function(){ok.textContent="";},2500);
-    });
+    var c=e.target.getAttribute("data-copy");
+    if(c!==null){ navigator.clipboard.writeText(assemble(prompts[c])).then(function(){ var ok=document.getElementById("pok"+c); ok.textContent="copied, ready to paste into any AI"; setTimeout(function(){ok.textContent="";},2600); }); return; }
+    var t=e.target.getAttribute("data-toggle");
+    if(t!==null){ var pv=document.getElementById("pt"+t); if(pv.style.display==="none"){ pv.textContent=assemble(prompts[t]); pv.style.display="block"; e.target.textContent="Hide prompt"; } else { pv.style.display="none"; e.target.textContent="Show prompt"; } }
   });
 })();
 </script>
