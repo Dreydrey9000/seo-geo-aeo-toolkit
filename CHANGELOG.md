@@ -1,5 +1,10 @@
 # Changelog — seo-geo-aeo-toolkit
 
+## [2026-06-16] (later same day)
+### Added
+- **Master Prompts tab** in the web tool: a library of 5 copy-paste, plug-into-any-AI prompts (SEO + GEO + AEO, Ideal Client (ICP) Builder, Brand Voice & Positioning Builder, Viral Hook Generator, Content Repurposer). Brand-neutral, fill-the-brackets. Lives in public/prompts.js, rendered as a second tab next to the Generator. Linkable at /#prompts.
+- master-prompts/ now also ships the 4 new prompts as standalone .md files.
+
 ## [2026-06-16]
 ### Added
 - **Initial public release.** A complete SEO + GEO + AEO toolkit in four pieces:
